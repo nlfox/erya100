@@ -25,6 +25,7 @@ class StickyMaster(controller.Master):
             import re
             if 'courseAction!toCourseVideo' in flow.request.url:
                 flow.response.content = re.sub("eval\(function.*?onStopMove\|mouseHander\|intervalTime\|function\|eryaPlayer.*?\)\,0\,\{\}\)\)",'',flow.response.content)
+                flow.response.content = flow.response.content.replace('pauseMovie','playMovie')
                 print flow.response.content
             if 'playerAction!getResourceUrl' in flow.request.url:
                 flow.response.content =re.sub(r'\"startTime\"\:(\d+)','"startTime":10',flow.response.content)
