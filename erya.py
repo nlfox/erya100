@@ -1,4 +1,6 @@
 # coding=utf-8
+import json
+
 __author__ = 'nlfox'
 from libmproxy import controller, proxy
 from libmproxy.proxy.server import ProxyServer
@@ -23,12 +25,15 @@ class StickyMaster(controller.Master):
         with decoded(flow.response):
             print flow.request.url
             import re
-            if 'courseAction!toCourseVideo' in flow.request.url:
-                flow.response.content = re.sub("eval\(function.*?onStopMove\|mouseHander\|intervalTime\|function\|eryaPlayer.*?\)\,0\,\{\}\)\)",'',flow.response.content)
-                flow.response.content = flow.response.content.replace('pauseMovie','playMovie')
-                print flow.response.content
-            if 'playerAction!getResourceUrl' in flow.request.url:
+            if 'moocplayer.js' in flow.request.url:
+                flow.response.content = re.sub(r'(MoocPlayer.prototype.switchWindow.*?)\/\*','/*',flow.response.content,flags=re.DOTALL)
+            if 'initdatawithviewer' in flow.request.url:
                 flow.response.content =re.sub(r'\"startTime\"\:(\d+)','"startTime":10',flow.response.content)
+                jsonData = json.loads(flow.response.content)
+                print "问题:",jsonData[0]["datas"][0]["description"],"答案:",
+                for i in jsonData[0]["datas"][0]["options"]:
+                    if i["isRight"]:
+                        print i["description"]
             flow.reply()
 
 config = proxy.ProxyConfig(port=8080)
